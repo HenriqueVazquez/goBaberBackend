@@ -1,5 +1,10 @@
+<h1 align="center">
+    <img alt="GoStack" src="https://rocketseat-cdn.s3-sa-east-1.amazonaws.com/bootcamp-header.png" width="200px" />
+</h1>
 <h3 align="center">
-  GoBaber backend
+  Backend da aplicação goBarber, construido para atender a demanda de salões de barbearia e cabeleleiro, mostrando e realizando agendamentos, além de realizar envio de emails para informação dos prestadores de serviçõs em relação a agendamentos realizados para cada profissional.
+  
+ Backend of the goBarber application, built to meet the demand of barber and hairdresser salons, showing and making appointments, in addition to sending emails to inform service providers regarding appointments made for each professional.
 </h3>
 
 <p align="center">
@@ -83,7 +88,7 @@ $ gh repo fork HenriqueVazquez/goBaberBackend
 
 ```bash
 # Clone o seu fork
-$ git clone url-do-seu-fork && cd FastFeet
+$ git clone url-do-seu-fork && cd gobarber
 
 # Crie uma branch com sua feature
 $ git checkout -b minha-feature

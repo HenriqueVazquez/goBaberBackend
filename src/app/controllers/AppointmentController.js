@@ -1,5 +1,13 @@
 import * as Yup from 'yup';
-import { startOfHour, parseISO, isBefore, format, subHours } from 'date-fns';
+import {
+  startOfHour,
+  parseISO,
+  isBefore,
+  isAfter,
+  format,
+  subHours,
+  setHours,
+} from 'date-fns';
 import pt from 'date-fns/locale/pt';
 import User from '../models/User';
 import File from '../models/File';
@@ -83,6 +91,15 @@ class AppointmentController {
       return res.status(400).json({ Erro: 'Past dates are not permitted!' });
     }
 
+    if (
+      isBefore(hourStart, setHours(hourStart, 7)) ||
+      isAfter(hourStart, setHours(hourStart, 20))
+    ) {
+      return res.status(400).json({
+        Erro: 'Informe uma data de agendamento, entre as 08:00 até as 20:00!',
+      });
+    }
+
     // verificando se a data esta valida para marcação
 
     const checkAvailability = await Appointment.findOne({
@@ -113,7 +130,7 @@ class AppointmentController {
     );
 
     await Notification.create({
-      content: `novo agendamento de ${user.name} para ${formatterdDate}`,
+      content: `Novo agendamento de ${user.name} para ${formatterdDate}`,
       user: provider_id,
     });
 

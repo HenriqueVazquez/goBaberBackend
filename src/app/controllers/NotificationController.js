@@ -3,7 +3,6 @@ import Notification from '../schemas/Notification';
 
 class NotificationController {
   async index(req, res) {
-    const { page = 1 } = req.query;
     // const skipPages = (page - 1) * 5;
     // Verificar se provider_id é um provider
 
@@ -18,10 +17,7 @@ class NotificationController {
     }
     const notifications = await Notification.find({
       user: req.userId,
-    })
-      .sort({ createdAt: 'desc' })
-      .limit(5)
-      .skip((page - 1) * 5);
+    }).sort({ createdAt: 'desc' });
 
     return res.json(notifications);
   }

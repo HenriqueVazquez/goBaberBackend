@@ -88,7 +88,7 @@ $ gh repo fork HenriqueVazquez/goBaberBackend
 
 ```bash
 # Clone o seu fork
-$ git clone url-do-seu-fork && cd FastFeet
+$ git clone url-do-seu-fork && cd gobarber
 
 # Crie uma branch com sua feature
 $ git checkout -b minha-feature

@@ -13,6 +13,18 @@ class UserController {
         password: Yup.string()
           .required()
           .min(6, 'A senha deve ter no mínimo 6 caracteres.'),
+        confirmPassword: Yup.string()
+          .min(6, 'A confirmação de senha deve ter no mínimo 6 caracteres')
+          .when('password', (password, field) =>
+            password
+              ? field
+                  .required('Confirme a senha')
+                  .oneOf(
+                    [Yup.ref('password')],
+                    'As senhas não conferem, digite novamente'
+                  )
+              : field
+          ),
       });
 
       /* if (!(await schema.isValid(req.body))) {
@@ -40,15 +52,16 @@ class UserController {
         provider,
       });
     } catch (err) {
-      if (err.errors.length === 1) {
-        return res.status(400).json({ Erro: err.message });
-      }
-      const errorMessages = [];
+      const errorMessages = {};
+      if (err instanceof Yup.ValidationError) {
+        err.inner.forEach((error) => {
+          errorMessages[error.path] = error.message;
+        });
 
-      err.inner.forEach((error) => {
-        errorMessages.push(error.message);
-      });
-      return res.status(400).json({ Erro: errorMessages });
+        return res.status(400).json(errorMessages);
+      }
+
+      return res.status(400).json({ errorMessages });
     }
   }
 
@@ -74,7 +87,14 @@ class UserController {
         confirmPassword: Yup.string()
           .min(6, 'A confirmação de senha deve ter no mínimo 6 caracteres')
           .when('password', (password, field) =>
-            password ? field.required().oneOf([Yup.ref('password')]) : field
+            password
+              ? field
+                  .required()
+                  .oneOf(
+                    [Yup.ref('password')],
+                    'As senhas não conferem, digite novamente'
+                  )
+              : field
           ),
       });
 

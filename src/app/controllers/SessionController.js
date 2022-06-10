@@ -8,49 +8,64 @@ import authConfig from '../../config/auth';
 
 class SessionController {
   async store(req, res) {
-    const schema = Yup.object().shape({
-      email: Yup.string().email().required(),
-      password: Yup.string().required(),
-    });
+    try {
+      const schema = Yup.object().shape({
+        email: Yup.string()
+          .email('Digite um email valido.')
+          .required('Email é obrigatorio para o login.'),
+        password: Yup.string().required('Senha é obrigatoria para o login.'),
+      });
 
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ Erro: 'validation fails' });
-    }
-    const { email, password } = req.body;
+      await schema.validate(req.body, {
+        abortEarly: false,
+      });
+      const { email, password } = req.body;
 
-    const user = await User.findOne({
-      where: { email },
-      include: [
-        {
-          model: File,
-          as: 'avatar',
-          attributes: ['id', 'path', 'url'],
+      const user = await User.findOne({
+        where: { email },
+        include: [
+          {
+            model: File,
+            as: 'avatar',
+            attributes: ['id', 'path', 'url'],
+          },
+        ],
+      });
+
+      if (!user) {
+        return res.status(401).json({ email: 'usuário não encontrado' });
+      }
+
+      if (!(await user.checkPassword(password))) {
+        return res.status(401).json({ password: 'Senha não esta correta!' });
+      }
+
+      const { id, name, avatar, provider } = user;
+
+      return res.json({
+        user: {
+          id,
+          name,
+          email,
+          provider,
+          avatar,
         },
-      ],
-    });
+        token: jwt.sign({ id }, authConfig.secret, {
+          expiresIn: authConfig.expiresIn,
+        }),
+      });
+    } catch (err) {
+      const errorMessages = {};
+      if (err instanceof Yup.ValidationError) {
+        err.inner.forEach((error) => {
+          errorMessages[error.path] = error.message;
+        });
 
-    if (!user) {
-      return res.status(401).json({ Erro: 'User not found' });
+        return res.status(400).json(errorMessages);
+      }
+
+      return res.status(400).json({ errorMessages });
     }
-
-    if (!(await user.checkPassword(password))) {
-      return res.status(401).json({ Erro: 'Password does not match!' });
-    }
-
-    const { id, name, avatar, provider } = user;
-
-    return res.json({
-      user: {
-        id,
-        name,
-        email,
-        provider,
-        avatar,
-      },
-      token: jwt.sign({ id }, authConfig.secret, {
-        expiresIn: authConfig.expiresIn,
-      }),
-    });
   }
 }
 

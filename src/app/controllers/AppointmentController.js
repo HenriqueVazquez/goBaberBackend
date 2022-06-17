@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import * as Yup from 'yup';
 import {
   startOfHour,
@@ -23,7 +24,7 @@ class AppointmentController {
 
     const appointments = await Appointment.findAll({
       where: { user_id: req.userId, canceled_at: null },
-      order: ['date'],
+      order: [['date', 'DESC']],
       limit: 5,
       offset: (page - 1) * 5,
       attributes: ['id', 'date', 'past', 'cancelable'],
@@ -42,7 +43,7 @@ class AppointmentController {
         },
       ],
     });
-
+    console.log(appointments);
     return res.json(appointments);
   }
 

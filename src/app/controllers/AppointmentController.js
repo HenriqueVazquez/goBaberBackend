@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 import {
   startOfHour,
   parseISO,
@@ -23,8 +24,14 @@ class AppointmentController {
     const { page = 1 } = req.query;
 
     const appointments = await Appointment.findAll({
-      where: { user_id: req.userId, canceled_at: null },
-      order: [['date', 'DESC']],
+      where: {
+        user_id: req.userId,
+        canceled_at: null,
+        date: {
+          [Op.gt]: new Date(),
+        },
+      },
+      order: [['date', 'ASC']],
       limit: 5,
       offset: (page - 1) * 5,
       attributes: ['id', 'date', 'past', 'cancelable'],
